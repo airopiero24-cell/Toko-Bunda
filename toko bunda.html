@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> TOKO BUNDA Digital Stamp</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .stamp-circle { transition: all 0.3s ease; }
+        .stamped { background-color: #0c0a13 !important; color: white !important; transform: scale(1.1); }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col items-center p-4">
+
+    <header class="text-center my-8">
+        <h1 class="text-4xl font-bold text-black-800 tracking-tight">TOKO BUNDA</h1>
+        <p class="text-gray-500 italic">Tea & Space</p>
+    </header>
+
+    <div class="bg-white shadow-xl rounded-3xl p-6 w-full max-w-sm border-t-8 border-green-600">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="font-semibold text-lg text-gray-700">Kartu Loyalitas</h2>
+            <span id="stamp-count" class="bg-green-100 text-green-700 text-sm px-3 py-1 rounded-full font-bold">0 / 10</span>
+        </div>
+
+        <div id="stamp-grid" class="grid grid-cols-5 gap-3 mb-8">
+            </div>
+
+        <p id="reward-status" class="text-center text-sm text-gray-500 mb-6">
+            Kumpulkan 10 stempel untuk 1 MINUMAN Gratis!
+        </p>
+
+        <button onclick="openAdminModal()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-2xl shadow-lg transition-transform active:scale-95">
+            <i class="fa-solid fa-qrcode mr-2"></i> Tambah Stempel
+        </button>
+    </div>
+
+    <div id="admin-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-xs text-center">
+            <h3 class="font-bold text-gray-800 mb-4">Validasi Kasir</h3>
+            <input type="password" id="admin-pin" placeholder="Masukkan PIN Kasir" class="w-full border-2 border-gray-200 p-3 rounded-xl mb-4 text-center text-xl tracking-widest focus:border-purple-500 outline-none">
+            <div class="flex gap-2">
+                <button onclick="closeAdminModal()" class="flex-1 text-gray-500 font-semibold py-2">Batal</button>
+                <button onclick="processStamp()" class="flex-1 bg-green-600 text-white font-semibold py-2 rounded-lg">Konfirmasi</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const MAX_STAMPS = 10;
+        const ADMIN_PIN = "1234"; // Ganti dengan PIN rahasia Toko Bunda
+        let currentStamps = parseInt(localStorage.getItem('Toko Bunda_stamps')) || 0;
+
+        function initGrid() {
+            const grid = document.getElementById('stamp-grid');
+            grid.innerHTML = '';
+            for (let i = 1; i <= MAX_STAMPS; i++) {
+                const circle = document.createElement('div');
+                circle.className = `stamp-circle h-12 w-12 border-2 border-dashed border-purple-300 rounded-full flex items-center justify-center text-purple-300 ${i <= currentStamps ? 'stamped' : ''}`;
+                circle.innerHTML = i <= currentStamps ? '<i class="fa-solid fa-check"></i>' : `<small>${i}</small>`;
+                grid.appendChild(circle);
+            }
+            document.getElementById('stamp-count').innerText = `${currentStamps} / ${MAX_STAMPS}`;
+            
+            if (currentStamps >= MAX_STAMPS) {
+                document.getElementById('reward-status').innerHTML = "<b class='text-green-600'>Hore! Kamu berhak dapat 1 es teh Gratis!</b>";
+            }
+        }
+
+        function openAdminModal() {
+            document.getElementById('admin-modal').classList.remove('hidden');
+            document.getElementById('admin-pin').focus();
+        }
+
+        function closeAdminModal() {
+            document.getElementById('admin-modal').classList.add('hidden');
+            document.getElementById('admin-pin').value = '';
+        }
+
+        function processStamp() {
+            const pinInput = document.getElementById('admin-pin').value;
+            if (pinInput === ADMIN_PIN) {
+                if (currentStamps < MAX_STAMPS) {
+                    currentStamps++;
+                    localStorage.setItem('Toko Bunda_stamps', currentStamps);
+                    initGrid();
+                    alert("Berhasil! Stempel Toko Bunda ditambahkan.");
+                    closeAdminModal();
+                } else {
+                    alert("Koleksi sudah penuh! Silakan tukarkan Es TEh gratis Anda.");
+                    closeAdminModal();
+                }
+            } else {
+                alert("PIN Salah! Akses khusus kasir.");
+            }
+        }
+
+        initGrid();
+    </script>
+</body>
+</html>
